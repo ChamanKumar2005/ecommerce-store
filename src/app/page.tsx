@@ -1,20 +1,41 @@
+"use client";
+
+import { useState } from "react";
+import Navbar from "../components/Navbar";
+import ProductCard from "../components/ProductCard";
+
 export default function Home() {
+  const [cartCount, setCartCount] = useState(0);
+
+  const handleAddToCart = () => {
+    setCartCount(cartCount + 1);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
-      <h1 className="text-6xl font-bold text-blue-500">
-        My E-commerce Store
-      </h1>
+    <>
+      <Navbar cartCount={cartCount} />
 
-      <p className="mt-4 text-xl text-gray-300">
-        Built with Next.js + React + Tailwind CSS
-      </p>
+      <main className="p-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ProductCard
+            title="Nike Shoes"
+            price={4999}
+            onAddToCart={handleAddToCart}
+          />
 
-      <button className="mt-8 rounded-xl bg-blue-500 px-6 py-3 text-lg font-semibold hover:bg-blue-700 hover:scale-105 transition">
-        Shop Now
-      </button>
-      <button className="mt-4 rounded-xl border border-white px-6 py-3">
-        Learn More
-      </button>
-    </main>
+          <ProductCard
+            title="iPhone 16"
+            price={79999}
+            onAddToCart={handleAddToCart}
+          />
+
+          <ProductCard
+            title="Smart Watch"
+            price={2999}
+            onAddToCart={handleAddToCart}
+          />
+        </div>
+      </main>
+    </>
   );
 }
