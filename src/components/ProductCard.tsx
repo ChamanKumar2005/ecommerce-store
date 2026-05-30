@@ -10,21 +10,23 @@ export default function ProductCard({
   onAddToCart,
 }: ProductCardProps) {
   return (
-    <div className="border rounded-xl p-4 shadow-md">
-      <h2 className="text-xl font-bold">
-        {title}
-      </h2>
+  <div className="rounded-xl border p-5 shadow-lg hover:shadow-2xl transition">
+    <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
 
-      <p className="text-gray-500">
-        ₹{price}
-      </p>
+    <h2 className="text-xl font-bold">
+      {title}
+    </h2>
 
-      <button
-        onClick={onAddToCart}
-        className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg"
-      >
-        Add to Cart
-      </button>
-    </div>
-  );
+    <p className="text-2xl font-semibold text-green-600 mt-2">
+      ₹{price}
+    </p>
+
+    <button
+      onClick={onAddToCart}
+      className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+    >
+      Add to Cart
+    </button>
+  </div>
+);
 }
