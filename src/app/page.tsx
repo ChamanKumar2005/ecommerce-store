@@ -62,8 +62,12 @@ export default function Home() {
   const [cartCount, setCartCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [cartItems, setCartItems] = useState<Product[]>([]);
 
-  const handleAddToCart = () => {
+  console.log(cartItems);
+
+  const handleAddToCart = (product: Product) => {
+    setCartItems([...cartItems, product]);
     setCartCount(cartCount + 1);
   };
 
@@ -78,6 +82,22 @@ export default function Home() {
 
   return matchesSearch && matchesCategory;
 });
+
+
+const totalPrice = cartItems.reduce(
+  (sum, item) => sum + item.price,
+  0
+);
+
+
+const removeFromCart = (indexToRemove: number) => {
+  const updatedCart = cartItems.filter(
+    (_, index) => index !== indexToRemove
+  );
+
+  setCartItems(updatedCart);
+  setCartCount(updatedCart.length);
+};
 
   return (
     <>
@@ -148,10 +168,42 @@ export default function Home() {
   price={product.price}
   image={product.image}
   category={product.category}
-  onAddToCart={handleAddToCart}
+  onAddToCart={() => handleAddToCart(product)}
 />
 ))}
         </div>
+        <section className="mt-12">
+          <h2 className="text-3xl font-bold mb-4">
+            Cart Items
+          </h2>
+
+          {cartItems.length === 0 ? (
+            <p>Your cart is empty.</p>
+          ) : (
+            <ul className="space-y-2">
+              {cartItems.map((item, index) => (
+                <li
+                  key={index}
+                  className="border p-3 rounded-lg flex justify-between items-center"
+                >
+                  <span>
+                    {item.title} - ₹{item.price.toLocaleString()}
+                  </span>
+
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Remove
+                  </button>
+              </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-4 text-2xl font-bold">
+            Total: ₹{totalPrice.toLocaleString()}
+          </p>
+          </section>
       </main>
     </>
   );
