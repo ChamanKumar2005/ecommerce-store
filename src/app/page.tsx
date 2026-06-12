@@ -58,18 +58,71 @@ const products: Product[] = [
   },
 ];
 
+type CartItem = Product & {
+  quantity: number;
+};
+
 export default function Home() {
-  const [cartCount, setCartCount] = useState(0);
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const cartCount = cartItems.reduce(
+  (sum, item) => sum + item.quantity,
+  0
+);
 
   console.log(cartItems);
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems([...cartItems, product]);
-    setCartCount(cartCount + 1);
-  };
+ const handleAddToCart = (product: Product) => {
+  const existingItem = cartItems.find(
+    (item) => item.id === product.id
+  );
+
+  if (existingItem) {
+    const updatedCart = cartItems.map((item) =>
+      item.id === product.id
+        ? {
+            ...item,
+            quantity: item.quantity + 1,
+          }
+        : item
+    );
+
+    setCartItems(updatedCart);
+  } else {
+    setCartItems([
+      ...cartItems,
+      {
+        ...product,
+        quantity: 1,
+      },
+    ]);
+  }
+};
+
+const increaseQuantity = (id: number) => {
+  const updatedCart = cartItems.map((item) =>
+    item.id === id
+      ? { ...item, quantity: item.quantity + 1 }
+      : item
+  );
+
+  setCartItems(updatedCart);
+};
+
+const decreaseQuantity = (id: number) => {
+  const updatedCart = cartItems
+    .map((item) =>
+      item.id === id
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    )
+    .filter((item) => item.quantity > 0);
+
+  setCartItems(updatedCart);
+};
+
 
  const filteredProducts = products.filter((product) => {
   const matchesSearch = product.title
@@ -85,7 +138,7 @@ export default function Home() {
 
 
 const totalPrice = cartItems.reduce(
-  (sum, item) => sum + item.price,
+  (sum, item) => sum + item.price * item.quantity,
   0
 );
 
@@ -96,7 +149,6 @@ const removeFromCart = (indexToRemove: number) => {
   );
 
   setCartItems(updatedCart);
-  setCartCount(updatedCart.length);
 };
 
   return (
@@ -187,15 +239,39 @@ const removeFromCart = (indexToRemove: number) => {
                   className="border p-3 rounded-lg flex justify-between items-center"
                 >
                   <span>
-                    {item.title} - ₹{item.price.toLocaleString()}
+                    <div>
+                      <p>
+                       {item.title} (Quantity: {item.quantity})
+                      </p>
+
+                     <p>
+                        ₹{item.price.toLocaleString()}
+                    </p>
+                    </div>
                   </span>
 
-                  <button
-                    onClick={() => removeFromCart(index)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => decreaseQuantity(item.id)}
+                      className="bg-red-500 px-3 py-1 rounded"
+                    >
+                      -
+                    </button>
+
+                    <button
+                      onClick={() => increaseQuantity(item.id)}
+                      className="bg-green-500 px-3 py-1 rounded"
+                    >
+                      +
+                    </button>
+
+                    <button
+                      onClick={() => removeFromCart(index)}
+                      className="bg-red-700 px-3 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
               </li>
               ))}
             </ul>
