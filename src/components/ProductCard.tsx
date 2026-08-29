@@ -6,6 +6,7 @@ type ProductCardProps = {
   image: string;
   category: string;
   onAddToCart: () => void;
+  onClick: () => void;
 };
 
 export default function ProductCard({
@@ -14,9 +15,13 @@ export default function ProductCard({
   image,
   category,
   onAddToCart,
+  onClick,
 }: ProductCardProps) {
   return (
-  <div className="rounded-xl border p-5 shadow-lg hover:shadow-2xl transition">
+  <div
+    onClick={onClick}
+    className="rounded-xl border p-5 shadow-lg hover:shadow-2xl transition cursor-pointer"
+  >
     <div className="relative h-40 mb-4">
   <Image
     src={image}
@@ -39,7 +44,10 @@ export default function ProductCard({
     </p>
 
     <button
-      onClick={onAddToCart}
+    onClick={(e) => {
+      e.stopPropagation();
+      onAddToCart();
+    }}
       className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
     >
       Add to Cart

@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
+import ProductModal from "../components/ProductModal";
 
 type Product = {
   id: number;
@@ -67,6 +68,8 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [selectedProduct, setSelectedProduct] =
+    useState<Product | null>(null);
   const cartCount = cartItems.reduce(
   (sum, item) => sum + item.quantity,
   0
@@ -74,12 +77,12 @@ export default function Home() {
 
   console.log(cartItems);
 
- const handleAddToCart = (product: Product) => {
+const handleAddToCart = (product: Product) => {
   const existingItem = cartItems.find(
     (item) => item.id === product.id
   );
 
-  if (existingItem) {
+  if(existingItem) {
     const updatedCart = cartItems.map((item) =>
       item.id === product.id
         ? {
@@ -90,7 +93,8 @@ export default function Home() {
     );
 
     setCartItems(updatedCart);
-  } else {
+  } 
+  else {
     setCartItems([
       ...cartItems,
       {
@@ -124,7 +128,7 @@ const decreaseQuantity = (id: number) => {
 };
 
 
- const filteredProducts = products.filter((product) => {
+const filteredProducts = products.filter((product) => {
   const matchesSearch = product.title
     .toLowerCase()
     .includes(searchTerm.toLowerCase());
@@ -171,10 +175,10 @@ const removeFromCart = (indexToRemove: number) => {
   <button
     onClick={() => setSelectedCategory("All")}
     className={`px-4 py-2 rounded-lg text-white ${
-  selectedCategory === "All"
-    ? "bg-green-600"
-    : "bg-blue-500"
-}`}
+      selectedCategory === "All"
+        ? "bg-green-600"
+        : "bg-blue-500"
+    }`}
   >
     All
   </button>
@@ -182,10 +186,10 @@ const removeFromCart = (indexToRemove: number) => {
   <button
     onClick={() => setSelectedCategory("Electronics")}
     className={`px-4 py-2 rounded-lg text-white ${
-  selectedCategory === "Electronics"
-    ? "bg-green-600"
-    : "bg-blue-500"
-}`}
+      selectedCategory === "Electronics"
+        ? "bg-green-600"
+        : "bg-blue-500"
+    }`}
   >
     Electronics
   </button>
@@ -193,10 +197,10 @@ const removeFromCart = (indexToRemove: number) => {
   <button
     onClick={() => setSelectedCategory("Shoes")}
     className={`px-4 py-2 rounded-lg text-white ${
-  selectedCategory === "Shoes"
-    ? "bg-green-600"
-    : "bg-blue-500"
-}`}
+      selectedCategory === "Shoes"
+        ? "bg-green-600"
+        : "bg-blue-500"
+    }`}
   >
     Shoes
   </button>
@@ -204,83 +208,95 @@ const removeFromCart = (indexToRemove: number) => {
   <button
     onClick={() => setSelectedCategory("Accessories")}
     className={`px-4 py-2 rounded-lg text-white ${
-  selectedCategory === "Accessories"
-    ? "bg-green-600"
-    : "bg-blue-500"
-}`}
+      selectedCategory === "Accessories"
+        ? "bg-green-600"
+        : "bg-blue-500"
+    }`}
   >
     Accessories
   </button>
 </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-  <ProductCard
-  key={product.id}
-  title={product.title}
-  price={product.price}
-  image={product.image}
-  category={product.category}
-  onAddToCart={() => handleAddToCart(product)}
-/>
-))}
-        </div>
-        <section className="mt-12">
-          <h2 className="text-3xl font-bold mb-4">
-            Cart Items
-          </h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {filteredProducts.map((product) => (
+      <ProductCard
+        key={product.id}
+        title={product.title}
+        price={product.price}
+        image={product.image}
+        category={product.category}
+        onAddToCart={() => handleAddToCart(product)}
+        onClick={() => setSelectedProduct(product)}
+      />
+    ))}
+  </div>
+      <section className="mt-12">
+        <h2 className="text-3xl font-bold mb-4">
+          Cart Items
+        </h2>
 
-          {cartItems.length === 0 ? (
-            <p>Your cart is empty.</p>
-          ) : (
-            <ul className="space-y-2">
-              {cartItems.map((item, index) => (
-                <li
-                  key={index}
-                  className="border p-3 rounded-lg flex justify-between items-center"
-                >
-                  <span>
-                    <div>
-                      <p>
-                       {item.title} (Quantity: {item.quantity})
-                      </p>
-
-                     <p>
-                        ₹{item.price.toLocaleString()}
+        {cartItems.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <ul className="space-y-2">
+            {cartItems.map((item, index) => (
+              <li
+                key={index}
+                className="border p-3 rounded-lg flex justify-between items-center"
+              >
+                <span>
+                  <div>
+                    <p>
+                      {item.title} (Quantity: {item.quantity})
                     </p>
-                    </div>
-                  </span>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => decreaseQuantity(item.id)}
-                      className="bg-red-500 px-3 py-1 rounded"
-                    >
-                      -
-                    </button>
-
-                    <button
-                      onClick={() => increaseQuantity(item.id)}
-                      className="bg-green-500 px-3 py-1 rounded"
-                    >
-                      +
-                    </button>
-
-                    <button
-                      onClick={() => removeFromCart(index)}
-                      className="bg-red-700 px-3 py-1 rounded"
-                    >
-                      Remove
-                    </button>
+                    <p>
+                      ₹{item.price.toLocaleString()}
+                  </p>
                   </div>
-              </li>
-              ))}
-            </ul>
-          )}
-          <p className="mt-4 text-2xl font-bold">
-            Total: ₹{totalPrice.toLocaleString()}
-          </p>
-          </section>
+                </span>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => decreaseQuantity(item.id)}
+                    className="bg-red-500 px-3 py-1 rounded"
+                  >
+                    -
+                  </button>
+
+                  <button
+                    onClick={() => increaseQuantity(item.id)}
+                    className="bg-green-500 px-3 py-1 rounded"
+                  >
+                    +
+                  </button>
+
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="bg-red-700 px-3 py-1 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+            </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-4 text-2xl font-bold">
+          Total: ₹{totalPrice.toLocaleString()}
+        </p>
+      </section>
       </main>
-    </>
+
+        {selectedProduct && (
+          <ProductModal
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            onAddToCart={() => {
+              handleAddToCart(selectedProduct);
+              setSelectedProduct(null);
+            }}
+          />
+        )}
+      </>
   );
 }
