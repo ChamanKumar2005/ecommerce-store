@@ -5,6 +5,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 import ProductModal from "../components/ProductModal";
+import { useCart } from "../context/CartContext";
 
 type Product = {
   id: number;
@@ -59,73 +60,25 @@ const products: Product[] = [
   },
 ];
 
-type CartItem = Product & {
-  quantity: number;
-};
 
 export default function Home() {
+  const {
+    cartItems,
+    cartCount,
+    totalPrice,
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
  
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedProduct, setSelectedProduct] =
     useState<Product | null>(null);
-  const cartCount = cartItems.reduce(
-  (sum, item) => sum + item.quantity,
-  0
-);
 
   console.log(cartItems);
 
-const handleAddToCart = (product: Product) => {
-  const existingItem = cartItems.find(
-    (item) => item.id === product.id
-  );
-
-  if(existingItem) {
-    const updatedCart = cartItems.map((item) =>
-      item.id === product.id
-        ? {
-            ...item,
-            quantity: item.quantity + 1,
-          }
-        : item
-    );
-
-    setCartItems(updatedCart);
-  } 
-  else {
-    setCartItems([
-      ...cartItems,
-      {
-        ...product,
-        quantity: 1,
-      },
-    ]);
-  }
-};
-
-const increaseQuantity = (id: number) => {
-  const updatedCart = cartItems.map((item) =>
-    item.id === id
-      ? { ...item, quantity: item.quantity + 1 }
-      : item
-  );
-
-  setCartItems(updatedCart);
-};
-
-const decreaseQuantity = (id: number) => {
-  const updatedCart = cartItems
-    .map((item) =>
-      item.id === id
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    )
-    .filter((item) => item.quantity > 0);
-
-  setCartItems(updatedCart);
-};
 
 
 const filteredProducts = products.filter((product) => {
@@ -141,19 +94,6 @@ const filteredProducts = products.filter((product) => {
 });
 
 
-const totalPrice = cartItems.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
-
-
-const removeFromCart = (indexToRemove: number) => {
-  const updatedCart = cartItems.filter(
-    (_, index) => index !== indexToRemove
-  );
-
-  setCartItems(updatedCart);
-};
 
   return (
     <>
@@ -224,7 +164,7 @@ const removeFromCart = (indexToRemove: number) => {
         price={product.price}
         image={product.image}
         category={product.category}
-        onAddToCart={() => handleAddToCart(product)}
+        onAddToCart={() => addToCart(product)}
         onClick={() => setSelectedProduct(product)}
       />
     ))}
@@ -238,9 +178,9 @@ const removeFromCart = (indexToRemove: number) => {
           <p>Your cart is empty.</p>
         ) : (
           <ul className="space-y-2">
-            {cartItems.map((item, index) => (
+            {cartItems.map((item) => (
               <li
-                key={index}
+                key={item.id}
                 className="border p-3 rounded-lg flex justify-between items-center"
               >
                 <span>
@@ -271,7 +211,7 @@ const removeFromCart = (indexToRemove: number) => {
                   </button>
 
                   <button
-                    onClick={() => removeFromCart(index)}
+                    onClick={() => removeFromCart(item.id)}
                     className="bg-red-700 px-3 py-1 rounded"
                   >
                     Remove
@@ -292,7 +232,7 @@ const removeFromCart = (indexToRemove: number) => {
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
             onAddToCart={() => {
-              handleAddToCart(selectedProduct);
+              addToCart(selectedProduct);
               setSelectedProduct(null);
             }}
           />
